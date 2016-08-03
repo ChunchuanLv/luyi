@@ -11,7 +11,7 @@ n=network.n; ne=network.ne;
 dt=simulation.dt;
 
 si = 0;
-period = 40;
+period = 50;
 rep = 1;
 
 tend	= rep*period; % trial time msec
@@ -76,10 +76,8 @@ title('bar plot of spikes');
 figure;
 maps = cell(num_pattern,1);
 colors = ['b','r','g','c','m','y','w','k'];
-maps{1}=plot_sorted(sps{1}, period, dt, n, ne, colors(1), maps{1});
-hold on;
-for p = 2:num_pattern
-    maps{p}=plot_sorted(sps{p}, period, dt, n, ne, colors(p), maps{p-1});
+for p = 1:num_pattern
+    maps{p}=plot_sorted(sps{p}, period, dt, n, ne, colors(p), maps{p});
     hold on;
 end
 title('sorted spike sequence')

@@ -1,15 +1,15 @@
-function simulate(n,num_pattern,filename)
+function simulate()
     seed=1;
     rng(seed);
 
     record = false;
     plotall = false;
-    saveall = true;
+    saveall = false;
     loadw = false;
     topology = true;
-%     filename = 't-psd-p5-100.mat';
+    filename = 't-psd-p5-100.mat';
 
-    %n=100;  % total # neurons
+    n=100;  % total # neurons
     ni=1;
     ne=n-ni; % # excitatory neurons
     aA      = 0.1; %update amount per trials.
@@ -17,7 +17,7 @@ function simulate(n,num_pattern,filename)
     si = 0; % noise
     interval = 1; % rep for each pattern
     trial_perpattern = 1000; % trials for each pattern
-%     num_pattern = 1;
+    num_pattern = 1;
     inum=linspace(1,num_pattern,num_pattern)'; % patterns
     rule = 0;
     % num_pattern = 5;

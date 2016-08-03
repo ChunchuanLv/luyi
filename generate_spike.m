@@ -13,11 +13,12 @@ function [vm_rec, spike] = generate_spike(network, synapse, simulation, inp, si,
     
     we = max(w,0);
     wi = -min(w,0);
-    ndt = period*reps/dt;
+    tend = period*reps;
+    ndt = tend/dt;
 
     op = 'delta';
     tmin = 0;
-    istim = istimuli(n, period, reps, dt, inp, stimampl, op);
+    istim = istimuli(n, period, reps, tend, dt, inp, stimampl, op);
 
     vm = vrest*ones(n,1);
     ge = zeros(n,ndt);
