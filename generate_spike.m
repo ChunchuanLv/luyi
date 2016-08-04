@@ -44,8 +44,13 @@ function [vm_rec, spike] = generate_spike(network, synapse, simulation, inp, si,
             rep_num = rep_num + 1;
         end
         % synaptic input currents
+        
         ie = ge(:,itdel).*(vrev_e-vm);
         ii = gi(:,itdel).*(vrev_i-vm);
+        if idt-idelay<(rep_num-1)*period/dt+1 && idt>(rep_num-1)*period/dt+1
+            ie = 0;
+            ii = 0;
+        end
         vmnext = vm + dt*tauminv.*(vrest-vm+istim(:,idt)+ie+ii+si*randn(n,1));
         vm_rec(:,idt+1) = vmnext;
         refr = find(lastspiketime > t-trefr);

@@ -1,4 +1,4 @@
-function simulate(n,num_pattern,filename)
+function simulate(n0, pconn0, num_pattern0, AgoalI0, rule0, structure0, filename)
     seed=1;
     rng(seed);
 
@@ -6,20 +6,20 @@ function simulate(n,num_pattern,filename)
     plotall = false;
     saveall = true;
     loadw = false;
-    topology = true;
-%     filename = 't-psd-p5-100.mat';
+    structure = structure0;
+    % filename = 'a.mat';
 
-    %n=100;  % total # neurons
+    n=n0;  % total # neurons
     ni=1;
     ne=n-ni; % # excitatory neurons
     aA      = 0.1; %update amount per trials.
     aw      = 0.01;
-    si = 0; % noise
+    si = 20; % noise
     interval = 1; % rep for each pattern
-    trial_perpattern = 1000; % trials for each pattern
-%     num_pattern = 1;
+    trial_perpattern = 2000; % trials for each pattern
+    num_pattern = num_pattern0;
     inum=linspace(1,num_pattern,num_pattern)'; % patterns
-    rule = 0;
+    rule = rule0;
     % num_pattern = 5;
     % num_injection = 1;
     %     inum = [1;2;3];
@@ -57,7 +57,7 @@ function simulate(n,num_pattern,filename)
 
     % homeostasis parameters
     AgoalE  = 1;
-    AgoalI  = 2;
+    AgoalI  = AgoalI0;
     Agoal   = idxE*AgoalE+idxI*AgoalI; % (col. vector)
 
     % simulation parameters
@@ -67,16 +67,29 @@ function simulate(n,num_pattern,filename)
 
     % create weight matrix index, w_{post,pre}
     % TODO: randomize
-
     w = zeros(n,n);
-    pconn = 0.2;
-    w_active = rand(n,n)<pconn;
+    if structure == 1
+        pconn = pconn0;
+        w_active = rand(n,n)<pconn;
+    end
 
-    if topology
+    if structure == 2
         p0 = 1;
         pos = rand(ne,ne);
         d0 = 2.3;
         [w_active pconn]= realnet(n, ne, p0, d0);
+    end
+    if structure == 3
+        w_active = zeros(n,n);
+        for i=1:ne-1
+            w_active(i,i+1)=1;
+            w_active(i+1,i)=1;
+        end
+        for i=1:ne
+            w_active(i,ne+1:end)=1;
+            w_active(ne+1:end,i)=1;
+        end
+        pconn = (4*n-6)/(n*(n-1));
     end
     w_active(:,ne+1:end)=1;
     w_active = w_active-diag(diag(w_active)); % exclude self-coupling
@@ -157,7 +170,10 @@ function simulate(n,num_pattern,filename)
             % synaptic input currents
             ie = ge(:,itdel).*(vrev_e-vm);
             ii = gi(:,itdel).*(vrev_i-vm);
-
+            if idt-idelay<1
+                ie = 0;
+                ii = 0;
+            end
             vmnext = vm + dt*tauminv.*(vrest-vm+istim(:,idt)+ie+ii+si*randn(n,1));
             if record
                 vm_rec(:,idt+1) = vmnext;
@@ -187,12 +203,13 @@ function simulate(n,num_pattern,filename)
             vm=vmnext;
         end
         a = ones(n,1);
-        if rule==1
-            inact = avAct(1:ne)<Agoal(1:ne);
-            a(inact)=(vthr-vm(inact))./max((we(inact,:)),[],2);
-        elseif rule==2
+        if rule==2
             inact = avAct(1:ne)==0;
             a(inact)=max(we(:))/wexc;
+        elseif rule==3
+            inact = avAct(1:ne)<Agoal(1:ne);
+            a(inact)=(sum(we(inact,:),2)./(sum(we(inact,:)~=0,2)))./...
+                (sum(we(:,inact),1)./(sum(we(:,inact)~=0,1)))';
         end
         as(:,itrial) = a;
         dw = aw*we.*((Agoal-avAct)*(avAct)').*repmat(a,1,n);
@@ -254,13 +271,13 @@ function simulate(n,num_pattern,filename)
         title('raster plot of the last trial')
 
         subplot(2,1,2);
-        plotall(meanact, 'r')
+        plot(meanact, 'r')
         hold on
-        plotall(meanavAct,'g')
+        plot(meanavAct,'g')
         hold on
-        plotall(ones(ntrial)*mean(Agoal), 'b');
+        plot(ones(ntrial)*mean(Agoal), 'b');
         legend('mean activations per trial', 'overall mean activation',...
-            'target activation')
+            'target activatspsion')
         title('averaged spike number')
         xlabel('trials')
         ylabel('number of spikes')
@@ -270,20 +287,9 @@ function simulate(n,num_pattern,filename)
         imagesc(w);
         colorbar;
         title('weight matrix')
-
-        colors = ['b','r','g','c','m','y','w','k'];
-        if num_pattern > 1
-            figure;
-            for i=1:num_pattern
-                plotall(meanacts(i,:),'color',colors(i));
-                hold on;
-                legendInfo{i} = ['pattern ' num2str(i)];
-            end
-            legend(legendInfo);
-            title('mean acts of each pattern')
-            xlabel('trials')
-            ylabel('mean activation')
-        end
+        figure;
+        plot_acttrace(meanacts);
+        title('mean acts of each pattern')
     end
 
     %save network

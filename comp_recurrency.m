@@ -3,7 +3,7 @@ n = 100;
 rs = zeros(k,1);
 rs2 = zeros(k,1);
 for i=1:k
-    filename = ['psd-p', num2str(i),'-0.2-',num2str(n),'.mat'];
+    filename = ['psd-p', num2str(i), '-0.2-', num2str(n),'.mat'];
     load(filename, 'network', 'simulation');
     inum = simulation.inum;
     w = network.w;
@@ -13,8 +13,8 @@ for i=1:k
     rs(i) = r;
 end
 for i=1:k
-    filename2 = ['t-psd-p', num2str(i),'-0.2-',num2str(n),'.mat'];
-    load(filename2, 'network', 'simulation');
+    filename = ['psd-p1-pconn', num2str(i*0.1), '-', num2str(n),'.mat'];
+    load(filename, 'network', 'simulation');
     inum = simulation.inum;
     w = network.w;
     w_active = network.w_active;
@@ -23,10 +23,12 @@ for i=1:k
     rs2(i) = r;
 end
 figure;
-plot(rs,'g')
-hold on;
-plot(rs2,'r');
+plot(rs)
 xlabel('number of patterns');
 ylabel('recurrency');
-legend('non-topological', 'topological');
 title('Recurrency');
+figure;
+plot(linspace(0.1,1,10),rs2)
+xlabel('connection probability');
+ylabel('recurrency');
+title('Active connection');

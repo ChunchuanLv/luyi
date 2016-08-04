@@ -10,9 +10,9 @@ vthr=synapse.vthr;
 n=network.n; ne=network.ne;
 dt=simulation.dt;
 
-si = 0;
+si = 20;
 period = 50;
-rep = 1;
+rep = 10;
 
 tend	= rep*period; % trial time msec
 ndt		= round(tend/dt);
@@ -36,25 +36,26 @@ for ind = 1:num_pattern
     sps{ind} = spike;
 end
 
+activation = 0;
 for i=1:num_pattern
     fprintf('average number of spikes for pattern %d is %.2f\n', i, sum(sps{i}(:))/rep);
+    activation = activation+sum(sps{i}(:))/rep;
 end
-
+fprintf('average activation for %d patterns is %.2f\n', num_pattern, activation/num_pattern);
 % raster plot
 figure;
 colors = ['b','r','g','c','m','y','w','k'];
 for i=1:num_pattern
-    plot_spike(sps{i}, dt, colors(i));
+    plot_spike(sps{i}(:,1:period/dt), dt, colors(i));
     hold on;
     legendInfo{i} = num2str(sum(sps{i}(:)));
 end
 
-legend(legendInfo);
-plot(linspace(0,tend, ndt+1),ne, 'r')
-title('raster plot of the last trial')
+% legend(legendInfo);
+plot(linspace(0,period, period/dt+1),ne, 'r')
+title('raster plot')
 xlabel('time (ms)')
 ylabel('neuron index')
-set(gca,'xtick',(0:period:tend))
 
 % statistics of patterns
 sps_split = cell(num_pattern, 1);
@@ -75,9 +76,11 @@ title('bar plot of spikes');
 % sorted spike sequence
 figure;
 maps = cell(num_pattern,1);
+maps{1}=plot_sorted(sps{1}, period, dt, n, ne, colors(1), maps{1});
+hold on;
 colors = ['b','r','g','c','m','y','w','k'];
-for p = 1:num_pattern
-    maps{p}=plot_sorted(sps{p}, period, dt, n, ne, colors(p), maps{p});
+for p = 2:num_pattern
+    maps{p}=plot_sorted(sps{p}, period, dt, n, ne, colors(p), maps{p-1});
     hold on;
 end
 title('sorted spike sequence')

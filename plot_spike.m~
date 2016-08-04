@@ -14,6 +14,6 @@ for ic=1:n
 end
 xlabel('time (ms)')
 ylabel('neuron index')
-set(gca,'XTick',0:10:tend);
-set(gca,'YTick',[1 n]);
+set(gca,'XLim',[1:tend]);
+set(gca,'YLim',[1 tend]);
 end
