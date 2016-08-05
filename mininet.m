@@ -1,7 +1,7 @@
 clear;
 seed=1;
 rng(seed);
-n=10;  % total # neurons
+n=4;  % total # neurons
 ne=n-1; % # excitatory neurons
 ni=1;
 
@@ -35,13 +35,13 @@ winh	= 200/ni/tau_i; %>0
 
 % homeostasis parameters
 AgoalE  = 1;
-AgoalI  = 2;
+AgoalI  = 3;
 Agoal   = idxE*AgoalE+idxI*AgoalI; % (col. vector)
-aA      = 0.05; %update amount per trials.
-aw      = 0.05;
+aA      = 0.1; %update amount per trials.
+aw      = 0.01;
 
 % simulation parameters
-tend	= 50; % trial time msec
+tend	= 30; % trial time msec
 dt		= 0.1; % smaller would be better
 ndt		= round(tend/dt);
 
@@ -104,7 +104,7 @@ disp = 100;
 ind = 1;
 av_err = 0;
 av_dw = 0;
-trial = 10000;
+trial = 2000;
 ntrial = trial*num_pattern;
 spike_rec = zeros(round(ntrial),n,ndt);
 w_rec = zeros(round(ntrial),n,n);
@@ -254,67 +254,60 @@ title('averaged spike number')
 xlabel('trials')
 ylabel('number of spikes')
 
-% figure;
-% x = linspace(0,tend,ndt);
-% for i=1:n
-%     subplot(n,1,i);
-%     plot(x, vm_rec(i,:));
-%     hold on;
-%     xlabel('time (ms)')
-%     ylabel('Vm (mV)')
-%     title(['mebrane voltage of neuron ', num2str(i)])
-% end
+figure;
+x = linspace(0,tend,ndt);
+for i=1:n
+    subplot(n,1,i);
+    plot(x, vm_rec(i,:));
+    hold on;
+    xlabel('time (ms)')
+    ylabel('Vm (mV)')
+    title(['mebrane voltage of neuron ', num2str(i)])
+end
 
-% figure;
-% for i=1:n
-%     subplot(n,2,2*i-1);
-%     plot(x, ge_rec(i,:));
-%     hold on;
-%     xlabel('time (ms)')
-%     ylabel('Ge')
-%     title(['Ge of neuron ', num2str(i)])
-%     subplot(n,2,2*i);
-%     plot(x, gi_rec(i,:));
-%     hold on;
-%     xlabel('time (ms)')
-%     ylabel('Gi')
-%     title(['Gi of neuron ', num2str(i)])
-% end
+figure;
+for i=1:n
+    subplot(n,2,2*i-1);
+    plot(x, ge_rec(i,:));
+    hold on;
+    xlabel('time (ms)')
+    ylabel('Ge')
+    title(['Ge of neuron ', num2str(i)])
+    subplot(n,2,2*i);
+    plot(x, gi_rec(i,:));
+    hold on;
+    xlabel('time (ms)')
+    ylabel('Gi')
+    title(['Gi of neuron ', num2str(i)])
+end
 
-% figure;
-% plotnet(w_active);
+w = we-wi;
+figure;
+imagesc(w);
+colorbar;
+title('weight matrix')
 
-% w = we-wi;
-% figure;
-% imagesc(w);
-% colorbar;
-% title('weight matrix')
-% 
-% colors = ['b','r','g','c','m','y','w','k'];
-% figure;
-% for i=1:num_pattern
-%     plot(meanacts(i,:),'color',colors(i));
-%     hold on
-%     legendInfo{i} = ['pattern ' num2str(i)];
-% end
-% legend(legendInfo);
-% title('mean acts of each patter')
-% 
-% figure;
-% for i=1:n
-%     subplot(n,1,i)
-%     plot(x,spikes(i,:))
-%     set(gca,'xlim',[0 tend])
-%     set(gca,'ytick',[0 1])
-%     xlabel('time (ms)');
-%     ylabel('number of spikes ');
-%     title(['spike of neuron ', num2str(i)]);
-%     hold on
-% end
-% save mini_network2pattern n idelay vrev_e vrev_i w tau_e tau_i...
-%     vrest tauminv trefr vreset vthr inum stimampl ne ni...
-%     w_active spike_rec w_rec dw_rec vm_rec meanact meanavAct...
-%     AgoalE AgoalI ntrial aA aw;
+colors = ['b','r','g','c','m','y','w','k'];
+figure;
+for i=1:num_pattern
+    plot(meanacts(i,:),'color',colors(i));
+    hold on
+    legendInfo{i} = ['pattern ' num2str(i)];
+end
+legend(legendInfo);
+title('mean acts of each patter')
+
+figure;
+for i=1:n
+    subplot(n,1,i)
+    plot(x,spikes(i,:))
+    set(gca,'xlim',[0 tend])
+    set(gca,'ytick',[0 1])
+    xlabel('time (ms)');
+    ylabel('number of spikes ');
+    title(['spike of neuron ', num2str(i)]);
+    hold on
+end
 network = struct;
 homeostasis = struct;
 simulation = struct;
@@ -347,4 +340,4 @@ records.spike_rec=spike_rec; records.w_rec=w_rec; records.dw_rec=dw_rec;
 records.vm_rec=vm_rec;
 records.meanacts=meanacts;
 records.acts = acts;
-save mini network homeostasis simulation synapse records;
+save toy network homeostasis simulation synapse records;

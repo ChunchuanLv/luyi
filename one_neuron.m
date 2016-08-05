@@ -59,26 +59,29 @@ end
 figure;
 x = linspace(0,tend,ndt);
 subplot(3,1,1);
-plot(x,istim, 'y');
-xlabel('time (ms)');
-ylabel('current (mA)');
+plot(x,istim, 'm');
+xlabel('time (ms)','FontSize', 17);
+ylabel('current (mA)','FontSize', 17);
+set(gca,'fontsize',15)
 set(gca,'xlim',[0 tend])
-title('external current Iext');
+title('External current Iext','FontSize', 17);
 subplot(3,1,2);
 plot(x,vm_rec, 'r');
 hold on;
 plot(x, vthr*ones(length(vm_rec)),'g');
 hold on;
 legend('Vm', 'Vthr');
-xlabel('time (ms)');
-ylabel('voltage (mV)');
-title('membrane voltage Vm');
+xlabel('time (ms)','FontSize', 17);
+ylabel('voltage (mV)','FontSize', 17);
+title('Membrane voltage Vm','FontSize', 17);
+set(gca,'fontsize',15)
 set(gca,'xlim',[0 tend])
 subplot(3,1,3);
 plot(x, spikes,'b');
-xlabel('time (ms)');
-ylabel('number of spikes');
-title('spike train of neuron');
+xlabel('time (ms)','FontSize', 17);
+ylabel('number of spikes','FontSize', 17);
+title('Spike train of neuron','FontSize', 17);
+set(gca,'fontsize',15)
 set(gca,'xlim',[0 tend])
 set(gca,'ytick',[0 1])
 
