@@ -1,16 +1,18 @@
-num_rule = 3;
+num_rule = 2;
 networks = cell(num_rule,1);
-networks{1}=load ('psd-r1-p2-pconn0.2-100.mat', 'records', 'network', 'homeostasis', 'simulation', 'synapse');
-networks{2}=load ('psd-r2-p2-pconn0.2-100.mat', 'records', 'network');
-networks{3}=load ('psd-r3-p2-pconn0.2-100.mat', 'records', 'network');
+networks{1}=load ('inh_full-psd-r1-p1-pconn0.2-100.mat', 'records', 'network', 'homeostasis', 'simulation', 'synapse');
+networks{2}=load ('n100.mat', 'records', 'network');
+% networks{3}=load ('psd-r3-p2-pconn0.2-100.mat', 'records', 'network');
 
 Agoal = networks{1}.homeostasis.Agoal;
-ne = networks{1}.network.ne;
-simulaton = networks{1}.simulation;
+n = networks{1}.network.n;
+simulation = networks{1}.simulation;
 synapse = networks{1}.synapse;
 inum = networks{1}.simulation.inum;
 ntrial = simulation.ntrial;
 [num_pattern, num_neuron] = size(inum);
+tend = simulation.tend;
+dt = simulation.dt;
 
 k = 200;
 errmeans = [];
@@ -46,11 +48,13 @@ end
 
 % compare for testing
 si = 20;
-rep = 10;
+rep = 100;
+period = tend;
+remove = 0;
 sps = cell(num_pattern);
 for r=1:num_rule
     for ind=1:num_pattern
-        [vms, spike] = generate_spike(network, synapse, simulation, inum(ind,:), si, period, rep);
+        [vms, spike] = generate_spike(networks{r}.network, synapse, simulation, inum(ind,:), si, period, rep, remove);
         sps{ind} = spike;
     end
     networks{r}.sps=sps;
@@ -65,3 +69,18 @@ for r=1:num_rule
         networks{r}.num_spikes = num_spikes;
     end
 end
+% statistics of patterns
+means = [];
+stds = [];
+labels = {'Trained without noise','Trained with noise'};
+for r=1:num_rule
+    means = [means; mean(networks{r}.num_spikes,2)];
+    stds = [stds; std(networks{r}.num_spikes,0,2)];
+end
+figure;
+bar(means);
+set(gca,'xticklabel',labels,'Fontsize',20);
+hold on;
+errorbar(means, stds,'r.');
+title('Bar plot of spikes','Fontsize',25);
+set(gca,'Fontsize',20);

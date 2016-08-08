@@ -1,9 +1,9 @@
-k = 10;
+k = 5;
 n = 100;
 rs = zeros(k,1);
 rs2 = zeros(k,1);
-for i=1:k
-    filename = ['psd-p', num2str(i), '-0.2-', num2str(n),'.mat'];
+for i=2:k
+    filename = ['p', num2str(i), '-psd-r1-', num2str(n),'.mat'];
     load(filename, 'network', 'simulation');
     inum = simulation.inum;
     w = network.w;
