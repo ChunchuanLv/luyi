@@ -1,7 +1,0 @@
-n = 50;
-filename = ['psd-'];
-for i = 1:10
-    inum = linspace(1,i,i)';
-    filename = [filename, num2str(i),'.mat'];
-    simulate(n, inum, filename);
-end
